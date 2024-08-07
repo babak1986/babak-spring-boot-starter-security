@@ -35,7 +35,8 @@ public final class JwtUtil {
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiry))
                 .subject(user.getUsername())
-                .claim(JwtUtil.CLAIM_AUTH, user.getAuthorities())
+                .claim(JwtUtil.CLAIM_AUTH, user.getAuthorities()
+                        .stream().map(userAuthority -> userAuthority.getAuthority()).toList())
                 .signWith(secretKey(), Jwts.SIG.HS256)
                 .compact();
     }
