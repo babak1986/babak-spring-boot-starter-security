@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 /**
  * Author: Babak Behzadi
  * Email: behzadi.babak@gmail.com
@@ -78,6 +80,7 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
         UserAuthority userAuthority = new UserAuthority();
         userAuthority.setAuthority(authority.getRole());
         userAuthority.setCurrent(true);
+        user.setAuthorities(Set.of(userAuthority));
         return submit(user);
     }
 
