@@ -18,7 +18,7 @@ public final class CookieUtil {
     }
 
     public static void put(HttpServletResponse response, String name, String value, boolean secure, boolean httpOnly) {
-        String cookie = String.format("%s=%s; secure=%s; httpOnly=%", name, value, secure, httpOnly);
+        String cookie = String.format("%s=%s; secure=%s; httpOnly=%s", name, value, secure, httpOnly);
         response.addHeader(HttpHeaders.COOKIE, cookie);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie);
     }
