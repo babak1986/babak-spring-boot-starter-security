@@ -1,8 +1,9 @@
 package com.babak.springboot.security.utils;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 
 import java.util.Arrays;
 
@@ -19,22 +20,31 @@ public final class CookieUtil {
                 .findFirst().orElse(null).getValue();
     }
 
-    public static void put(HttpServletResponse response, String name, String value,
-                           boolean secure, boolean httpOnly, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setSecure(secure);
-        cookie.setHttpOnly(httpOnly);
-        cookie.setMaxAge(maxAge);
-        response.addCookie(cookie);
+    public static void create(HttpServletResponse response, String name, String value,
+                              boolean secure, boolean httpOnly, int maxAge) {
+        String cookie = ResponseCookie
+                .from(name)
+                .value(value)
+                .secure(secure)
+                .httpOnly(httpOnly)
+                .maxAge(maxAge)
+                .build()
+                .toString();
+        response.addHeader(HttpHeaders.COOKIE, cookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie);
     }
 
     public static void token(HttpServletResponse response, String token) {
-        put(response, "b_token", token, true, true, CookieUtil.MAX_AGE);
+        create(response, "b_token", token, true, true, CookieUtil.MAX_AGE);
     }
 
     public static void invalidate(HttpServletResponse response, String name) {
-        Cookie cookie = new Cookie(name, "");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        String cookie = ResponseCookie
+                .from(name)
+                .maxAge(0)
+                .build()
+                .toString();
+        response.addHeader(HttpHeaders.COOKIE, cookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie);
     }
 }
