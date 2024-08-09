@@ -4,11 +4,11 @@ import com.babak.springboot.security.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 /**
  * Author: Babak Behzadi
@@ -31,7 +31,14 @@ public class BaseSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration corsConfiguration = new CorsConfiguration();
+                    corsConfiguration.addAllowedOriginPattern("/**");
+                    corsConfiguration.addAllowedOrigin(CorsConfiguration.ALL);
+                    corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+                    corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+                    return corsConfiguration;
+                }))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(excludedUrls).permitAll()
                         .anyRequest().authenticated()
