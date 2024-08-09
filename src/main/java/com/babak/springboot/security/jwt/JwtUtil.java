@@ -49,4 +49,12 @@ public final class JwtUtil {
                 .parse(token)
                 .getPayload();
     }
+
+    public boolean validate(String token) {
+        Claims claims = extractAll(token);
+        if (claims.getExpiration().after(new Date())) {
+            return true;
+        }
+        return false;
+    }
 }

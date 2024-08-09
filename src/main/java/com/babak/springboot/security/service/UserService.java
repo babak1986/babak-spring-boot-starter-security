@@ -10,6 +10,7 @@ import com.babak.springboot.security.model.UserAuthenticationModel;
 import com.babak.springboot.security.model.UserSubmitModel;
 import com.babak.springboot.security.repository.UserRepository;
 import com.babak.springboot.security.utils.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +33,7 @@ import java.util.Set;
 public class UserService extends BaseService<User, Long, UserRepository> implements UserDetailsService, PasswordEncoder {
 
     private final JwtUtil jwtUtil;
+    private final HttpServletRequest request;
     private final HttpServletResponse response;
 
     @Value("${base.security.encoder.secret}")
@@ -39,10 +41,24 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
 
     public UserService(UserRepository repository,
                        JwtUtil jwtUtil,
+                       HttpServletRequest request,
                        HttpServletResponse response) {
         super(repository);
         this.jwtUtil = jwtUtil;
+        this.request = request;
         this.response = response;
+    }
+
+    @Override
+    public String encode(CharSequence rawPassword) {
+        return new Pbkdf2PasswordEncoder(encoderSecret, 16, 1,
+                Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256).encode(rawPassword);
+    }
+
+    @Override
+    public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        return new Pbkdf2PasswordEncoder(encoderSecret, 16, 1,
+                Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256).matches(rawPassword, encodedPassword);
     }
 
     @Override
@@ -57,7 +73,7 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         user.getUsername(), null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                CookieUtil.token(response,  jwtUtil.generateToken(user));
+                CookieUtil.token(response, jwtUtil.generateToken(user));
                 return user;
             }
         }
@@ -84,15 +100,10 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
         return submit(user);
     }
 
-    @Override
-    public String encode(CharSequence rawPassword) {
-        return new Pbkdf2PasswordEncoder(encoderSecret, 16, 1,
-                Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256).encode(rawPassword);
-    }
-
-    @Override
-    public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        return new Pbkdf2PasswordEncoder(encoderSecret, 16, 1,
-                Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256).matches(rawPassword, encodedPassword);
+    public boolean validate() {
+        if (jwtUtil.validate(CookieUtil.get(request, CookieUtil.JWT_TOKEN_NAME))) {
+            return true;
+        }
+        return false;
     }
 }

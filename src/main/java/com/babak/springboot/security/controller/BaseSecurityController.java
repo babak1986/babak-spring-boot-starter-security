@@ -1,5 +1,6 @@
 package com.babak.springboot.security.controller;
 
+import com.babak.springboot.security.exception.BaseSecurityException;
 import com.babak.springboot.security.model.UserAuthenticationModel;
 import com.babak.springboot.security.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,13 @@ public final class BaseSecurityController {
     public ResponseEntity login(@RequestBody UserAuthenticationModel authenticationModel) {
         userService.login(authenticationModel);
         return ResponseEntity.ok("");
+    }
+
+    @PostMapping("validate")
+    public ResponseEntity validate() {
+        if (userService.validate()) {
+            return ResponseEntity.ok("");
+        }
+        throw new BaseSecurityException.InvalidCredentialsException();
     }
 }

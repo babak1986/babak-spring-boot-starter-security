@@ -14,6 +14,7 @@ import java.util.Arrays;
 public final class CookieUtil {
 
     private final static int MAX_AGE = 60 * 60 * 24 * 90;
+    public final static String JWT_TOKEN_NAME = "b_token";
 
     public static String get(HttpServletRequest request, String name) {
         return Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals(name))
@@ -35,7 +36,7 @@ public final class CookieUtil {
     }
 
     public static void token(HttpServletResponse response, String token) {
-        create(response, "b_token", token, true, true, CookieUtil.MAX_AGE);
+        create(response, JWT_TOKEN_NAME, token, true, true, CookieUtil.MAX_AGE);
     }
 
     public static void invalidate(HttpServletResponse response, String name) {
