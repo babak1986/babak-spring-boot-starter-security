@@ -4,6 +4,7 @@ import com.babak.springboot.jpa.domain.BaseEntity;
 import jakarta.persistence.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,7 +27,10 @@ public class User extends BaseEntity<Long> implements UserDetails {
     private boolean credentialsNonExpired;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
-    private Set<UserAuthority> authorities;
+    private Set<UserAuthority> authorities = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private Set<UserSession> tokens = new HashSet<>();
 
     @Override
     public String getUsername() {
@@ -123,4 +127,11 @@ public class User extends BaseEntity<Long> implements UserDetails {
         this.authorities = authorities;
     }
 
+    public Set<UserSession> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(Set<UserSession> tokens) {
+        this.tokens = tokens;
+    }
 }

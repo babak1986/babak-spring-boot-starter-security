@@ -3,6 +3,7 @@ package com.babak.springboot.security.service;
 import com.babak.springboot.jpa.service.BaseService;
 import com.babak.springboot.security.domain.User;
 import com.babak.springboot.security.domain.UserAuthority;
+import com.babak.springboot.security.domain.UserSession;
 import com.babak.springboot.security.enumeration.Authority;
 import com.babak.springboot.security.exception.BaseSecurityException;
 import com.babak.springboot.security.jwt.JwtUtil;
@@ -73,7 +74,13 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         user.getUsername(), null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                CookieUtil.token(response, jwtUtil.generateToken(user));
+                String token = jwtUtil.generateToken(user);
+                UserSession userSession = new UserSession();
+                userSession.setToken(token);
+                userSession.setIp(request.getRemoteAddr());
+                user.getTokens().add(userSession);
+                getRepository().save(user);
+                CookieUtil.token(response, token);
                 return user;
             }
         }
@@ -98,6 +105,11 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
         userAuthority.setCurrent(true);
         user.setAuthorities(Set.of(userAuthority));
         return submit(user);
+    }
+
+    public void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        CookieUtil.invalidate(response, CookieUtil.JWT_TOKEN_NAME);
     }
 
     public boolean validate() {

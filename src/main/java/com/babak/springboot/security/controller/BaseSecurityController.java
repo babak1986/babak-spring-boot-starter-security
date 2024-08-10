@@ -4,10 +4,7 @@ import com.babak.springboot.security.exception.BaseSecurityException;
 import com.babak.springboot.security.model.UserAuthenticationModel;
 import com.babak.springboot.security.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Author: Babak Behzadi
@@ -26,6 +23,12 @@ public final class BaseSecurityController {
     @PostMapping("login")
     public ResponseEntity login(@RequestBody UserAuthenticationModel authenticationModel) {
         userService.login(authenticationModel);
+        return ResponseEntity.ok("");
+    }
+
+    @GetMapping("logout")
+    public ResponseEntity logout() {
+        userService.logout();
         return ResponseEntity.ok("");
     }
 

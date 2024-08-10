@@ -27,10 +27,12 @@ public final class CookieUtil {
                               boolean secure, boolean httpOnly, int maxAge) {
         String cookie = ResponseCookie
                 .from(name)
-                .value(URLEncoder.encode(value, Charset.forName("UTF-8")))
+                .value(value)
                 .secure(secure)
                 .httpOnly(httpOnly)
                 .maxAge(maxAge)
+                .path("/")
+                .sameSite("true")
                 .build()
                 .toString();
         response.addHeader(HttpHeaders.COOKIE, cookie);

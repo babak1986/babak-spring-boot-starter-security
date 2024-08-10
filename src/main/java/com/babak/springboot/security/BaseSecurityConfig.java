@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.List;
+
 /**
  * Author: Babak Behzadi
  * Email: behzadi.babak@gmail.com
@@ -40,7 +42,11 @@ public class BaseSecurityConfig {
                     return corsConfiguration;
                 }))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(excludedUrls).permitAll()
+                        .requestMatchers(List.of(
+                                "/base/security/login",
+                                "/base/security/logout",
+                                "/base/security/validate",
+                                excludedUrls).toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated()
                 ).build();
     }
