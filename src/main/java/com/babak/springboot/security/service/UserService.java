@@ -10,6 +10,7 @@ import com.babak.springboot.security.jwt.JwtUtil;
 import com.babak.springboot.security.model.UserAuthenticationModel;
 import com.babak.springboot.security.model.UserSubmitModel;
 import com.babak.springboot.security.repository.UserRepository;
+import com.babak.springboot.security.repository.UserSessionRepository;
 import com.babak.springboot.security.utils.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
     private final JwtUtil jwtUtil;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
+    private final UserSessionRepository sessionRepository;
 
     @Value("${base.security.encoder.secret}")
     private String encoderSecret;
@@ -43,11 +45,13 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
     public UserService(UserRepository repository,
                        JwtUtil jwtUtil,
                        HttpServletRequest request,
-                       HttpServletResponse response) {
+                       HttpServletResponse response,
+                       UserSessionRepository sessionRepository) {
         super(repository);
         this.jwtUtil = jwtUtil;
         this.request = request;
         this.response = response;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
@@ -67,6 +71,7 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
         return getRepository().findByUsername(username).orElse(null);
     }
 
+    @Transactional
     public User login(UserAuthenticationModel authenticationModel) {
         User user = (User) getRepository().findByUsername(authenticationModel.getUsername()).orElse(null);
         if (user != null) {
@@ -78,6 +83,8 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
                 UserSession userSession = new UserSession();
                 userSession.setToken(token);
                 userSession.setIp(request.getRemoteAddr());
+                userSession.setActive(true);
+                userSession.setUser(user);
                 user.getTokens().add(userSession);
                 getRepository().save(user);
                 CookieUtil.token(response, token);
@@ -113,8 +120,11 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
     }
 
     public boolean validate() {
-        if (jwtUtil.validate(CookieUtil.get(request, CookieUtil.JWT_TOKEN_NAME))) {
-            return true;
+        String token = CookieUtil.get(request, CookieUtil.JWT_TOKEN_NAME);
+        if (sessionRepository.findActive(token).isPresent()) {
+            if (jwtUtil.validate(CookieUtil.get(request, CookieUtil.JWT_TOKEN_NAME))) {
+                return true;
+            }
         }
         return false;
     }
