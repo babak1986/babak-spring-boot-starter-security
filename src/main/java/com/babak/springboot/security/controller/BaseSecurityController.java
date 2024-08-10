@@ -3,6 +3,7 @@ package com.babak.springboot.security.controller;
 import com.babak.springboot.security.exception.BaseSecurityException;
 import com.babak.springboot.security.model.UserAuthenticationModel;
 import com.babak.springboot.security.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,8 @@ public final class BaseSecurityController {
     }
 
     @PostMapping("login")
-    public ResponseEntity login(@RequestBody UserAuthenticationModel authenticationModel) {
+    public ResponseEntity login(@RequestBody UserAuthenticationModel authenticationModel,
+                                HttpServletResponse response) {
         userService.login(authenticationModel);
         return ResponseEntity.ok("");
     }

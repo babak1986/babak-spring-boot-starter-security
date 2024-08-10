@@ -32,7 +32,6 @@ public final class CookieUtil {
                 .secure(secure)
                 .httpOnly(httpOnly)
                 .maxAge(maxAge)
-                .path("/")
                 .build()
                 .toString();
         response.addHeader(HttpHeaders.COOKIE, cookie);
@@ -40,7 +39,7 @@ public final class CookieUtil {
     }
 
     public static void token(HttpServletResponse response, String token) {
-        create(response, JWT_TOKEN_NAME, token, false, true, MAX_AGE);
+        create(response, JWT_TOKEN_NAME, token, true, true, MAX_AGE);
     }
 
     public static void invalidate(HttpServletResponse response, String name) {
