@@ -32,7 +32,6 @@ public final class CookieUtil {
                 .httpOnly(httpOnly)
                 .maxAge(maxAge)
                 .path("/")
-                .sameSite("true")
                 .build()
                 .toString();
         response.addHeader(HttpHeaders.COOKIE, cookie);
