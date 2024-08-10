@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -25,7 +27,7 @@ public final class CookieUtil {
                               boolean secure, boolean httpOnly, int maxAge) {
         String cookie = ResponseCookie
                 .from(name)
-                .value(value)
+                .value(URLEncoder.encode(value, Charset.forName("UTF-8")))
                 .secure(secure)
                 .httpOnly(httpOnly)
                 .maxAge(maxAge)
