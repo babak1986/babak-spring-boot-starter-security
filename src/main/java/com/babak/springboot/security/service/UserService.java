@@ -79,7 +79,7 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         user.getUsername(), null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                String token = jwtUtil.generateToken(user);
+                String token = jwtUtil.generateToken(user, request.getRemoteAddr());
                 UserSession userSession = new UserSession();
                 userSession.setToken(token);
                 userSession.setIp(request.getRemoteAddr());

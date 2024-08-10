@@ -5,8 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -19,8 +17,11 @@ public final class CookieUtil {
     public final static String JWT_TOKEN_NAME = "b_token";
 
     public static String get(HttpServletRequest request, String name) {
-        return Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals(name))
-                .findFirst().orElse(null).getValue();
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals(name))
+                    .findFirst().orElse(null).getValue();
+        }
+        return null;
     }
 
     public static void create(HttpServletResponse response, String name, String value,
@@ -39,7 +40,7 @@ public final class CookieUtil {
     }
 
     public static void token(HttpServletResponse response, String token) {
-        create(response, JWT_TOKEN_NAME, token, true, true, CookieUtil.MAX_AGE);
+        create(response, JWT_TOKEN_NAME, token, false, true, CookieUtil.MAX_AGE);
     }
 
     public static void invalidate(HttpServletResponse response, String name) {
