@@ -71,7 +71,6 @@ public class UserService extends BaseService<User, Long, UserRepository> impleme
         return getRepository().findByUsername(username).orElse(null);
     }
 
-    @Transactional
     public User login(UserAuthenticationModel authenticationModel) {
         User user = (User) getRepository().findByUsername(authenticationModel.getUsername()).orElse(null);
         if (user != null) {

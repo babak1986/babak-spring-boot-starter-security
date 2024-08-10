@@ -28,7 +28,7 @@ public class User extends BaseEntity<Long> implements UserDetails {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<UserAuthority> authorities = new HashSet<>();
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<UserSession> tokens = new HashSet<>();
 

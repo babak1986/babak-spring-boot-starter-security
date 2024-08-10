@@ -40,7 +40,7 @@ public final class CookieUtil {
     }
 
     public static void token(HttpServletResponse response, String token) {
-        create(response, JWT_TOKEN_NAME, token, false, true, CookieUtil.MAX_AGE);
+        create(response, JWT_TOKEN_NAME, token, false, true, MAX_AGE);
     }
 
     public static void invalidate(HttpServletResponse response, String name) {
