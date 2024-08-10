@@ -30,15 +30,17 @@ public final class JwtUtil {
 
     public String generateToken(User user) {
         Date now = new Date();
-        return Jwts
-                .builder()
-                .issuedAt(now)
-                .expiration(new Date(now.getTime() + expiry))
-                .subject(user.getUsername())
-                .claim(JwtUtil.CLAIM_AUTH, user.getAuthorities()
-                        .stream().map(userAuthority -> userAuthority.getAuthority()).toList())
-                .signWith(secretKey(), Jwts.SIG.HS256)
-                .compact();
+        StringBuilder token = new StringBuilder("Bearer ");
+        return token.append(
+                        Jwts.builder()
+                                .issuedAt(now)
+                                .expiration(new Date(now.getTime() + expiry))
+                                .subject(user.getUsername())
+                                .claim(JwtUtil.CLAIM_AUTH, user.getAuthorities()
+                                        .stream().map(userAuthority -> userAuthority.getAuthority()).toList())
+                                .signWith(secretKey(), Jwts.SIG.HS256)
+                                .compact())
+                .toString();
     }
 
     private Claims extractAll(String token) {
@@ -46,7 +48,7 @@ public final class JwtUtil {
                 .parser()
                 .verifyWith(secretKey())
                 .build()
-                .parse(token)
+                .parse(token.substring(7))
                 .getPayload();
     }
 
