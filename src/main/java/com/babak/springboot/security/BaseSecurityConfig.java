@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,6 +33,14 @@ public class BaseSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        List<String> excludes = new ArrayList<>();
+        excludes.add("/base/security/login");
+        excludes.add("/base/security/logout");
+        excludes.add("/base/security/validate");
+        if (excludedUrls != null) {
+            Arrays.asList(excludedUrls).forEach(s -> excludes.add(s));
+        }
+
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
@@ -42,11 +52,7 @@ public class BaseSecurityConfig {
                     return corsConfiguration;
                 }))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(List.of(
-                                "/base/security/login",
-                                "/base/security/logout",
-                                "/base/security/validate",
-                                excludedUrls).toArray(String[]::new)).permitAll()
+                        .requestMatchers(excludes.toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated()
                 ).build();
     }
